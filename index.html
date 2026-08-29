@@ -24,6 +24,7 @@
     --shadow: 0 4px 14px rgba(0,0,0,0.08);
     --radius: 10px;
     --serif: "Kaiti SC", "STKaiti", KaiTi, "SimSun", "Songti SC", serif;
+    --prose-serif: "Songti SC", STSong, "Noto Serif CJK SC", "Source Han Serif SC", SimSun, serif;
     --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
     --mono: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   }
@@ -146,26 +147,28 @@
     position: relative;
     padding: 0 36px;
   }
-  .big-quote blockquote::before {
+  .quote-copy { display: inline; }
+  .quote-copy::before {
     content: "「";
-    position: absolute;
-    left: 0;
-    top: -6px;
-    font-size: 2.4rem;
+    display: inline-block;
+    margin-right: 2px;
+    font-size: 1.35em;
     color: var(--red);
     opacity: .35;
     font-family: var(--serif);
-    line-height: 1;
+    line-height: 0;
+    vertical-align: -0.08em;
   }
-  .big-quote blockquote::after {
+  .quote-copy::after {
     content: "」";
-    font-size: 2.4rem;
+    display: inline-block;
+    margin-left: 2px;
+    font-size: 1.35em;
     color: var(--red);
     opacity: .35;
     font-family: var(--serif);
-    line-height: 1;
-    margin-left: 4px;
-    vertical-align: baseline;
+    line-height: 0;
+    vertical-align: -0.08em;
   }
   .big-quote cite {
     display: block;
@@ -196,22 +199,46 @@
     height: 1px;
     background: linear-gradient(90deg, transparent, rgba(150,40,27,0.35), transparent);
   }
-  .about p { margin: 0 0 16px; color: #44403a; line-height: 1.85; text-align: justify; }
-  .about .two-col {
-    column-count: 2;
-    column-gap: 32px;
+  .prose {
+    font-family: var(--prose-serif);
+    color: #403a33;
+    font-size: 1.05rem;
+    line-height: 1.95;
   }
-  @media (max-width: 640px) { .about .two-col { column-count: 1; } }
+  .prose p {
+    margin: 0;
+    text-align: justify;
+    text-justify: inter-ideograph;
+    text-indent: 2em;
+  }
+  .prose p.no-indent { text-indent: 0; }
+  .prose p.about-intro {
+    margin-bottom: 24px;
+    color: #37332e;
+    font-size: 1.08rem;
+  }
+  .about-columns {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 32px;
+  }
 
   /* ---------- 情怀 ---------- */
+  .memory-heading-section {
+    max-width: 960px;
+    padding-bottom: 12px;
+  }
   .memory-wrap {
-    max-width: 900px;
+    max-width: 960px;
     margin: 0 auto;
-    padding: 0 20px 40px;
+    padding: 0 20px 44px;
   }
   .memory {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1.08fr 0.92fr;
+    grid-template-areas:
+      "copy image"
+      "copy quote";
     gap: 32px;
     align-items: start;
     background: #fdf9ec;
@@ -222,23 +249,21 @@
     box-shadow: var(--shadow);
   }
   .memory-text {
-    font-family: var(--serif);
-    color: var(--ink-blue);
-    font-size: 1.05rem;
-    line-height: 1.9;
+    grid-area: copy;
   }
-  .memory-text p { margin: 0 0 14px; text-indent: 2em; }
-  .memory-text p.no-indent { text-indent: 0; }
-  .memory-text .quote {
+  .memory-text p + p { margin-top: 14px; }
+  .memory-quote {
+    grid-area: quote;
     text-align: center;
-    margin: 22px 0 10px;
+    margin: 20px 8px 0;
+    font-family: var(--serif);
     font-size: 1.25rem;
+    line-height: 1.65;
     color: var(--red-dark);
     letter-spacing: 3px;
-    text-indent: 0;
     font-weight: 600;
   }
-  .memory-text .quote small {
+  .memory-quote small {
     display: block;
     font-size: 0.78rem;
     color: #8a8070;
@@ -248,14 +273,30 @@
     font-weight: 400;
   }
   .memory-img {
+    grid-area: image;
     width: 100%;
+    height: auto;
+    aspect-ratio: 3 / 2;
     border-radius: 4px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     display: block;
   }
   @media (max-width: 640px) {
-    .memory { grid-template-columns: 1fr; }
-    .memory-img { order: -1; max-height: 220px; object-fit: cover; }
+    .about-columns {
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+    .memory-wrap { padding: 0 16px 36px; }
+    .memory {
+      grid-template-columns: 1fr;
+      grid-template-areas:
+        "image"
+        "copy"
+        "quote";
+      gap: 24px;
+      padding: 24px 20px 22px;
+    }
+    .memory-quote { margin-top: 0; }
   }
 
   /* ---------- 目录 ---------- */
@@ -351,6 +392,7 @@
 
   @media (max-width: 720px) {
     .hero { grid-template-columns: 1fr; text-align: center; }
+    .hero-left { text-align: center; }
     .hero-left .stats { justify-content: center; }
     .hero-left .lead { margin-left: auto; margin-right: auto; }
     .hero-right { height: 200px; }
@@ -361,7 +403,11 @@
     .grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
     .card { padding: 10px 8px 12px; }
     .section { padding: 24px 16px; }
+    .memory-heading-section { padding-bottom: 12px; }
     .big-quote { padding: 40px 16px; }
+    .prose { font-size: 1rem; line-height: 1.9; }
+    .memory { padding: 22px 18px 20px; }
+    .memory-quote { font-size: 1.12rem; letter-spacing: 2px; }
   }
 </style>
 </head>
@@ -392,32 +438,34 @@
 
 <section class="big-quote">
   <blockquote>
-    河水既不像老牛说的那样浅，也不像松鼠说的那样深。
+    <span class="quote-copy">河水既不像老牛说的那样浅，也不像松鼠说的那样深。</span>
     <cite>《小马过河》</cite>
   </blockquote>
 </section>
 
 <section class="section">
   <h2 class="section-title">关于这套课本</h2>
-  <div class="about two-col">
-    <p>这是人民教育出版社编制的六年制小学语文教材，通行于上世纪八十年代至九十年代初。整整一代人，从 a o e 开始，跟着它学会了写字、读书、写作文。</p>
-    <p>十二册课本，从第一册的拼音田字格，到高年级的《小马过河》《骄傲的孔雀》《珍贵的教科书》。每一页黑白插图、每一课生字表，都带着那个年代特有的朴素与认真。</p>
-    <p>教材已绝版多年，旧书散落在旧书市场和故纸堆里。本站将十二册原书逐页扫描整理，做成在线阅读，只为留住一份可以随时翻开的记忆。</p>
+  <div class="about prose">
+    <p class="about-intro no-indent">这是人民教育出版社编制的六年制小学语文教材，通行于上世纪八十年代至九十年代初。整整一代人，从 a o e 开始，跟着它学会了写字、读书、写作文。</p>
+    <div class="about-columns">
+      <p>十二册课本，从第一册的拼音田字格，到高年级的《小马过河》《骄傲的孔雀》《珍贵的教科书》。每一页黑白插图、每一课生字表，都带着那个年代特有的朴素与认真。</p>
+      <p>教材已绝版多年，旧书散落在旧书市场和故纸堆里。本站将十二册原书逐页扫描整理，做成在线阅读，只为留住一份可以随时翻开的记忆。</p>
+    </div>
   </div>
 </section>
 
-<section class="section" style="padding-bottom:8px;">
+<section class="section memory-heading-section">
   <h2 class="section-title">写给翻书的人</h2>
 </section>
 <div class="memory-wrap">
   <div class="memory">
-    <div class="memory-text">
+    <div class="memory-text prose">
       <p class="no-indent">如果你也曾在清晨的教室里大声朗读，也曾把铅笔削得只剩一小截还舍不得扔，也曾因为背不出课文被留堂。那这十二册书里，一定有你我都回不去的童年。</p>
       <p>那时候的快乐很简单。新课本发下来，第一件事是闻油墨香，然后包上挂历纸的书皮。一篇课文背完，老师用红笔打个大大的勾。下课时折纸飞机，用透明胶粘补破了角的作业本。</p>
       <p>一晃几十年。课本还在，翻书的人已经到了中年。再点开第一册，那个跟着老师念 a o e 的小孩，仿佛就坐在昨天的教室里，阳光斜斜地照在课桌上。</p>
-      <p class="quote">回不去的青春，就让它住在这里。<small>珍惜当下，好好生活</small></p>
     </div>
-    <img class="memory-img" src="images/classroom.webp" alt="80年代教室插画" loading="lazy" width="1200" height="800">
+    <img class="memory-img" src="images/classroom-v2-1200.webp" srcset="images/classroom-v2-800.webp 800w, images/classroom-v2-1200.webp 1200w" sizes="(max-width: 480px) calc(100vw - 72px), (max-width: 640px) calc(100vw - 76px), (max-width: 960px) calc(46vw - 64.4px), 378px" alt="阳光照进摆满木课桌的旧式教室插画" loading="lazy" decoding="async" width="1200" height="800">
+    <p class="memory-quote">回不去的青春，就让它住在这里。<small>珍惜当下，好好生活</small></p>
   </div>
 </div>
 
