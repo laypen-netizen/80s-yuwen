@@ -2,15 +2,19 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>阅读 · 80年代小学语文课本</title>
+<meta name="theme-color" content="#f7f1e3">
+<meta name="robots" content="noindex">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'wasm-unsafe-eval'; connect-src 'self'; font-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
 <style>
   :root {
     --paper: #f7f1e3;
-    --ink: #2d2d2d;
+    --ink: #2d2a24;
     --red: #c0392b;
     --red-dark: #96281b;
-    --bar-bg: #fff;
+    --bar-bg: #fffdf8;
     --shadow: 0 2px 10px rgba(0,0,0,0.08);
   }
   * { box-sizing: border-box; }
@@ -21,32 +25,39 @@
     color: var(--ink);
     display: flex; flex-direction: column;
   }
+
   .topbar {
     display: flex; align-items: center; gap: 10px;
-    padding: 8px 12px;
+    padding: 8px calc(12px + env(safe-area-inset-left)) 8px 12px;
     background: var(--bar-bg);
     box-shadow: var(--shadow);
     z-index: 10;
     flex-wrap: wrap;
   }
   .topbar a.back {
-    text-decoration: none; color: var(--red); font-size: 0.9rem; padding: 4px 8px; border: 1px solid rgba(0,0,0,0.08); border-radius: 6px; background: #fafafa;
+    text-decoration: none; color: var(--red); font-size: 0.9rem;
+    padding: 5px 10px; border: 1px solid rgba(0,0,0,0.08); border-radius: 6px; background: #fafafa;
+    white-space: nowrap;
   }
-  .topbar .title { font-weight: 700; font-size: 1rem; }
-  .topbar .sub { color: #777; font-size: 0.85rem; }
+  .topbar .title { font-weight: 700; font-size: 1rem; white-space: nowrap; }
+  .topbar .sub { color: #777; font-size: 0.85rem; white-space: nowrap; }
   .topbar .spacer { flex: 1; }
-  .topbar .ctrl {
-    display: inline-flex; align-items: center; gap: 6px;
-    font-size: 0.85rem;
-  }
+  .topbar .ctrl { display: inline-flex; align-items: center; gap: 6px; font-size: 0.85rem; }
   .topbar .ctrl button {
-    background: #fff; border: 1px solid rgba(0,0,0,0.12); border-radius: 6px; padding: 4px 8px; cursor: pointer; font-size: 0.85rem; color: var(--ink);
+    background: #fff; border: 1px solid rgba(0,0,0,0.12); border-radius: 6px;
+    padding: 5px 9px; cursor: pointer; font-size: 0.85rem; color: var(--ink);
+    touch-action: manipulation; min-width: 32px; min-height: 32px;
   }
-  .topbar .ctrl button:hover { background: #f5f5f5; }
-  .topbar .ctrl input[type=range] { width: 120px; }
+  .topbar .ctrl button:hover { background: #f5f0e4; }
+  .topbar .ctrl button:focus-visible { outline: 2px solid var(--red); outline-offset: 1px; }
+  .topbar .ctrl button.active { background: var(--red); color: #fff; border-color: var(--red-dark); }
+  .topbar .ctrl input[type=range] { width: 120px; touch-action: manipulation; }
 
   .viewer {
-    flex: 1; overflow: auto; display: flex; align-items: flex-start; justify-content: center; padding: 16px 12px 40px; position: relative;
+    flex: 1; overflow: auto; display: flex; align-items: flex-start; justify-content: center;
+    padding: 16px 12px calc(40px + env(safe-area-inset-bottom));
+    position: relative;
+    overscroll-behavior: contain;
   }
   .viewer canvas {
     background: #fff;
@@ -54,178 +65,67 @@
     border-radius: 4px;
     max-width: 100%;
     display: block;
+    touch-action: pinch-zoom;
   }
+  .viewer canvas.page-in { animation: pageIn .18s ease-out; }
+  @keyframes pageIn { from { opacity: .25; } to { opacity: 1; } }
+
   .overlay {
     position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: none;
   }
   .overlay .msg {
-    background: rgba(255,255,255,0.95); padding: 12px 16px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); font-size: 0.9rem; color: #555; pointer-events: auto;
+    background: rgba(255,253,248,0.96); padding: 12px 18px; border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1); font-size: 0.9rem; color: #555; pointer-events: auto; text-align: center;
+  }
+  .overlay .msg .retry {
+    margin-top: 8px; background: var(--red); color: #fff; border: none; border-radius: 6px;
+    padding: 6px 18px; font-size: 0.9rem; cursor: pointer; letter-spacing: 2px;
   }
   .overlay.hidden { display: none; }
 
-  .tap-zone {
-    position: absolute; top: 0; bottom: 0; width: 20%; cursor: pointer; z-index: 5;
-  }
+  .tap-zone { position: absolute; top: 0; bottom: 0; width: 18%; cursor: pointer; z-index: 5; }
   .tap-zone.left { left: 0; }
   .tap-zone.right { right: 0; }
   .tap-zone:hover { background: rgba(0,0,0,0.02); }
 
   @media (max-width: 640px) {
-    .topbar .ctrl input[type=range] { width: 80px; }
+    .topbar { gap: 6px; padding-top: 6px; padding-bottom: 6px; }
     .topbar .sub { display: none; }
+    .topbar .title { font-size: 0.92rem; }
+    .topbar .ctrl input[type=range] { width: 72px; }
+    .topbar .ctrl button { padding: 4px 7px; }
+    .tap-zone { width: 24%; }
+    .viewer { padding: 10px 8px calc(32px + env(safe-area-inset-bottom)); }
   }
 </style>
 </head>
 <body>
 <div class="topbar">
-  <a class="back" href="index.html">← 返回目录</a>
+  <a class="back" href="index.html" aria-label="返回目录页">← 目录</a>
   <div class="title" id="vTitle">加载中…</div>
   <div class="sub" id="vSub"></div>
   <div class="spacer"></div>
-  <div class="ctrl">
-    <button id="btnPrev" title="上一页 (←)">◀</button>
-    <span id="pageInfo">- / -</span>
-    <button id="btnNext" title="下一页 (→)">▶</button>
-    <input id="pageSlider" type="range" min="1" value="1" title="拖动跳转">
-    <button id="btnFit" title="适应宽度">适应</button>
-    <button id="btnZoomOut" title="缩小">-</button>
-    <button id="btnZoomIn" title="放大">+</button>
+  <div class="ctrl" role="toolbar" aria-label="阅读控制">
+    <button id="btnPrev" title="上一页（← 方向键）" aria-label="上一页">◀</button>
+    <span id="pageInfo" aria-live="polite">- / -</span>
+    <button id="btnNext" title="下一页（→ 方向键）" aria-label="下一页">▶</button>
+    <input id="pageSlider" type="range" min="1" value="1" title="拖动跳页" aria-label="页码滑块">
+    <button id="btnFitWidth" class="active" title="适应宽度" aria-label="适应宽度">适宽</button>
+    <button id="btnFitPage" title="整页显示" aria-label="整页显示">整页</button>
+    <button id="btnZoomOut" title="缩小" aria-label="缩小">−</button>
+    <button id="btnZoomIn" title="放大" aria-label="放大">＋</button>
   </div>
 </div>
 
 <div class="viewer" id="viewer">
-  <canvas id="pageCanvas"></canvas>
-  <div class="overlay" id="overlay"><div class="msg" id="msg">正在加载 PDF…</div></div>
-  <div class="tap-zone left" id="tapLeft"></div>
-  <div class="tap-zone right" id="tapRight"></div>
+  <canvas id="pageCanvas" aria-label="课本页面"></canvas>
+  <div class="overlay" id="overlay"><div class="msg" id="msg">正在加载课本扫描件…</div></div>
+  <div class="tap-zone left" id="tapLeft" aria-hidden="true"></div>
+  <div class="tap-zone right" id="tapRight" aria-hidden="true"></div>
 </div>
 
-<script type="module">
-  import { VOLUMES } from './js/volumes.js';
-  import * as pdfjsLib from './js/pdf.min.mjs';
-  pdfjsLib.GlobalWorkerOptions.workerSrc = './js/pdf.worker.min.mjs';
-
-  const params = new URLSearchParams(location.search);
-  const volN = parseInt(params.get('v') || '1', 10);
-  const vol = VOLUMES.find(v => v.n === volN) || VOLUMES[0];
-
-  document.getElementById('vTitle').textContent = `第${vol.n}册`;
-  document.getElementById('vSub').textContent = vol.grade;
-  document.title = `第${vol.n}册 · ${vol.grade} · 80年代小学语文课本`;
-
-  const canvas = document.getElementById('pageCanvas');
-  const ctx = canvas.getContext('2d');
-  const overlay = document.getElementById('overlay');
-  const msg = document.getElementById('msg');
-  const pageInfo = document.getElementById('pageInfo');
-  const slider = document.getElementById('pageSlider');
-  const viewer = document.getElementById('viewer');
-
-  let pdfDoc = null;
-  let currentPage = 1;
-  let scale = 1.5; // css pixels per PDF point
-  let fitMode = 'width'; // 'width' | 'page' | 'custom'
-
-  function showMessage(t) { msg.textContent = t; overlay.classList.remove('hidden'); }
-  function hideMessage() { overlay.classList.add('hidden'); }
-
-  async function loadPdf() {
-    showMessage('正在加载 PDF，请稍候…');
-    try {
-      const url = `./pdfs/${vol.file}`;
-      pdfDoc = await pdfjsLib.getDocument({
-        url,
-        cMapUrl: 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.7.76/cmaps/',
-        cMapPacked: true,
-      }).promise;
-      currentPage = 1;
-      slider.max = pdfDoc.numPages;
-      slider.value = 1;
-      pageInfo.textContent = `1 / ${pdfDoc.numPages}`;
-      hideMessage();
-      renderPage(currentPage);
-    } catch (e) {
-      showMessage('加载失败：' + (e.message || e));
-      console.error(e);
-    }
-  }
-
-  function computeScale(page, mode) {
-    const vp = page.getViewport({ scale: 1 });
-    const containerW = viewer.clientWidth - 24;
-    const containerH = viewer.clientHeight - 24;
-    if (mode === 'width') return containerW / vp.width;
-    if (mode === 'page') return Math.min(containerW / vp.width, containerH / vp.height);
-    return scale;
-  }
-
-  let renderTask = null;
-  async function renderPage(num) {
-    if (!pdfDoc) return;
-    if (num < 1) num = 1;
-    if (num > pdfDoc.numPages) num = pdfDoc.numPages;
-    currentPage = num;
-    slider.value = num;
-    pageInfo.textContent = `${num} / ${pdfDoc.numPages}`;
-    showMessage('渲染中…');
-    try {
-      const page = await pdfDoc.getPage(num);
-      const s = computeScale(page, fitMode);
-      const viewport = page.getViewport({ scale: s });
-      canvas.width = viewport.width;
-      canvas.height = viewport.height;
-      canvas.style.width = viewport.width + 'px';
-      canvas.style.height = viewport.height + 'px';
-      if (renderTask) { renderTask.cancel(); }
-      renderTask = page.render({ canvasContext: ctx, viewport });
-      await renderTask.promise;
-      hideMessage();
-    } catch (e) {
-      if (e && e.name === 'RenderingCancelledException') { /* ignore */ }
-      else { console.error(e); }
-    }
-  }
-
-  function prevPage() { if (currentPage > 1) renderPage(currentPage - 1); }
-  function nextPage() { if (pdfDoc && currentPage < pdfDoc.numPages) renderPage(currentPage + 1); }
-
-  document.getElementById('btnPrev').addEventListener('click', prevPage);
-  document.getElementById('btnNext').addEventListener('click', nextPage);
-  document.getElementById('tapLeft').addEventListener('click', prevPage);
-  document.getElementById('tapRight').addEventListener('click', nextPage);
-
-  slider.addEventListener('input', () => {
-    const n = parseInt(slider.value, 10);
-    pageInfo.textContent = `${n} / ${pdfDoc.numPages}`;
-  });
-  slider.addEventListener('change', () => {
-    renderPage(parseInt(slider.value, 10));
-  });
-
-  document.getElementById('btnZoomIn').addEventListener('click', () => { fitMode = 'custom'; scale *= 1.2; renderPage(currentPage); });
-  document.getElementById('btnZoomOut').addEventListener('click', () => { fitMode = 'custom'; scale /= 1.2; renderPage(currentPage); });
-  document.getElementById('btnFit').addEventListener('click', () => { fitMode = 'width'; renderPage(currentPage); });
-
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); prevPage(); }
-    if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') { e.preventDefault(); nextPage(); }
-    if (e.key === 'Home') { e.preventDefault(); renderPage(1); }
-    if (e.key === 'End') { e.preventDefault(); renderPage(pdfDoc ? pdfDoc.numPages : 1); }
-  });
-
-  let touchStartX = 0;
-  viewer.addEventListener('touchstart', (e) => { touchStartX = e.changedTouches[0].screenX; }, { passive: true });
-  viewer.addEventListener('touchend', (e) => {
-    const dx = e.changedTouches[0].screenX - touchStartX;
-    if (dx > 50) prevPage();
-    if (dx < -50) nextPage();
-  }, { passive: true });
-
-  window.addEventListener('resize', () => {
-    if (fitMode !== 'custom') renderPage(currentPage);
-  });
-
-  loadPdf();
-</script>
+<script src="js/volumes.js"></script>
+<script src="js/pdf.min.js"></script>
+<script src="js/read.js"></script>
 </body>
 </html>

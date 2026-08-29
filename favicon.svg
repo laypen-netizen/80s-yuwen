@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <rect x="6" y="8" width="52" height="48" rx="4" fill="#f7f1e3" stroke="#96281b" stroke-width="3"/>
+  <rect x="30" y="8" width="4" height="48" fill="#96281b"/>
+  <text x="17" y="38" font-family="Kaiti SC, STKaiti, KaiTi, serif" font-size="20" fill="#c0392b" text-anchor="middle">语</text>
+  <text x="47" y="38" font-family="Kaiti SC, STKaiti, KaiTi, serif" font-size="20" fill="#2c3e70" text-anchor="middle">文</text>
+</svg>

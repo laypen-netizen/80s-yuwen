@@ -12,3 +12,4 @@ const VOLUMES = [
   { n: 11, file: 'v11.pdf', title: '第十一册', grade: '六年级 上学期' },
   { n: 12, file: 'v12.pdf', title: '第十二册', grade: '六年级 下学期' },
 ];
+window.VOLUMES = VOLUMES;
