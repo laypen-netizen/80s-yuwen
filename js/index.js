@@ -22,7 +22,7 @@ for (const g of groups) {
     wrap.className = 'cover-wrap';
     const img = document.createElement('img');
     img.className = 'cover';
-    img.src = `covers/v${String(v.n).padStart(2, '0')}.jpg`;
+    img.src = `covers/v${String(v.n).padStart(2, '0')}.jpg?v=2`;
     img.alt = `第${v.n}册封面`;
     img.loading = 'lazy';
     wrap.appendChild(img);

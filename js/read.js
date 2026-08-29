@@ -59,7 +59,7 @@ function syncHash(n) {
 
 // ---------- 占位图 ----------
 function showPlaceholder() {
-  placeholder.src = 'covers/v' + String(vol.n).padStart(2, '0') + '.jpg';
+  placeholder.src = 'covers/v' + String(vol.n).padStart(2, '0') + '.jpg?v=2';
   placeholder.style.display = 'block';
 }
 function hidePlaceholder() {
