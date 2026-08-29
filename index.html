@@ -23,69 +23,167 @@
     --card-bg: #fff;
     --shadow: 0 4px 14px rgba(0,0,0,0.08);
     --radius: 10px;
-    --kai: "Kaiti SC", "STKaiti", KaiTi, "FZKai-Z03S", serif;
+    --serif: "Kaiti SC", "STKaiti", KaiTi, "SimSun", "Songti SC", serif;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    --mono: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   }
   * { box-sizing: border-box; }
   html, body { margin: 0; padding: 0; }
   body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    font-family: var(--sans);
     background: var(--paper);
     color: var(--ink);
     line-height: 1.75;
   }
 
-  /* ---------- Hero ---------- */
-  .hero {
+  /* ---------- 顶栏 ---------- */
+  .topbar {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    letter-spacing: 2px;
+    color: #8a8070;
     text-align: center;
-    padding: 56px 20px 40px;
-    background:
-      radial-gradient(ellipse at 50% 0%, #fff 0%, transparent 70%),
-      var(--paper);
+    padding: 10px 16px;
+    border-bottom: 1px solid rgba(0,0,0,0.08);
+    background: var(--paper);
   }
-  .hero .tag {
-    display: inline-block;
-    font-size: 0.78rem;
-    letter-spacing: 4px;
-    color: var(--red);
-    border: 1px solid rgba(192,57,43,0.35);
-    border-radius: 999px;
-    padding: 2px 14px;
-    margin-bottom: 18px;
+
+  /* ---------- Hero 杂志式 ---------- */
+  .hero {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 44px 20px 36px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+    align-items: center;
   }
-  .hero h1 {
-    margin: 0;
-    font-family: var(--kai);
-    font-size: clamp(1.9rem, 6vw, 3rem);
-    font-weight: 700;
+  .hero-left { text-align: left; }
+  .hero-left .kicker {
+    font-family: var(--mono);
+    font-size: 0.72rem;
     letter-spacing: 3px;
-    color: var(--red-dark);
+    color: var(--red);
+    text-transform: uppercase;
+    margin-bottom: 10px;
   }
-  .hero .sub {
-    margin: 10px 0 0;
+  .hero-left h1 {
+    margin: 0;
+    font-family: var(--serif);
+    font-size: clamp(2rem, 5.2vw, 3.4rem);
+    font-weight: 700;
+    line-height: 1.15;
+    color: var(--red-dark);
+    letter-spacing: 2px;
+  }
+  .hero-left .lead {
+    margin: 14px 0 0;
     color: #6b6357;
-    font-size: clamp(0.9rem, 3vw, 1.05rem);
+    font-size: clamp(0.92rem, 2.2vw, 1.1rem);
+    line-height: 1.6;
+    max-width: 420px;
+  }
+  .hero-left .stats {
+    margin-top: 20px;
+    display: flex;
+    gap: 24px;
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    color: #8a8070;
+  }
+  .hero-left .stats b {
+    color: var(--ink-blue);
+    font-size: 1.1rem;
+    font-weight: 600;
+  }
+
+  /* 封面拼贴 */
+  .hero-right {
+    position: relative;
+    height: 260px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .cover-collage {
+    position: relative;
+    width: 220px;
+    height: 290px;
+  }
+  .cover-collage img {
+    position: absolute;
+    width: 130px;
+    height: auto;
+    aspect-ratio: 231/320;
+    object-fit: contain;
+    border-radius: 3px 6px 6px 3px;
+    box-shadow: 3px 6px 18px rgba(0,0,0,0.22);
+    background: #fff;
+    transition: transform .3s ease;
+  }
+  .cover-collage img:nth-child(1) { left: 0; top: 20px; transform: rotate(-8deg); z-index: 1; }
+  .cover-collage img:nth-child(2) { left: 45px; top: 0; transform: rotate(4deg); z-index: 2; }
+  .cover-collage img:nth-child(3) { left: 90px; top: 30px; transform: rotate(-3deg); z-index: 3; }
+  .cover-collage img:nth-child(4) { left: 55px; top: 70px; transform: rotate(6deg); z-index: 4; }
+  .cover-collage:hover img:nth-child(1) { transform: rotate(-12deg) translateX(-6px); }
+  .cover-collage:hover img:nth-child(2) { transform: rotate(0deg) translateY(-4px); }
+  .cover-collage:hover img:nth-child(3) { transform: rotate(-6deg) translateX(6px); }
+  .cover-collage:hover img:nth-child(4) { transform: rotate(10deg) translateY(4px); }
+
+  /* ---------- 大引用页 ---------- */
+  .big-quote {
+    background: var(--paper-deep);
+    padding: 56px 20px;
+    text-align: center;
+  }
+  .big-quote blockquote {
+    margin: 0 auto;
+    max-width: 720px;
+    font-family: var(--serif);
+    font-size: clamp(1.3rem, 3.2vw, 1.9rem);
+    line-height: 1.7;
+    color: var(--ink-blue);
+    position: relative;
+  }
+  .big-quote blockquote::before {
+    content: "「";
+    position: absolute;
+    left: -28px;
+    top: -6px;
+    font-size: 2.4rem;
+    color: var(--red);
+    opacity: .35;
+    font-family: var(--serif);
+  }
+  .big-quote blockquote::after {
+    content: "」";
+    font-size: 2.4rem;
+    color: var(--red);
+    opacity: .35;
+    font-family: var(--serif);
+    vertical-align: text-bottom;
+    margin-left: 4px;
+  }
+  .big-quote cite {
+    display: block;
+    margin-top: 16px;
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    color: #8a8070;
+    font-style: normal;
     letter-spacing: 1px;
   }
-  .hero .stats {
-    margin-top: 22px;
-    display: flex;
-    justify-content: center;
-    gap: 28px;
-    color: #8a8070;
-    font-size: 0.85rem;
-  }
-  .hero .stats b { color: var(--ink-blue); font-size: 1.05rem; }
 
   /* ---------- 章节 ---------- */
-  .section { max-width: 780px; margin: 0 auto; padding: 32px 20px; }
+  .section { max-width: 780px; margin: 0 auto; padding: 40px 20px 28px; }
   .section-title {
     display: flex;
     align-items: center;
     gap: 12px;
-    font-family: var(--kai);
+    font-family: var(--serif);
     font-size: 1.3rem;
     color: var(--red-dark);
-    margin: 0 0 16px;
+    margin: 0 0 18px;
     letter-spacing: 2px;
   }
   .section-title::before, .section-title::after {
@@ -95,37 +193,70 @@
     background: linear-gradient(90deg, transparent, rgba(150,40,27,0.35), transparent);
   }
   .about p { margin: 0 0 14px; color: #44403a; }
+  .about .two-col {
+    column-count: 2;
+    column-gap: 32px;
+  }
+  @media (max-width: 640px) { .about .two-col { column-count: 1; } }
 
-  /* ---------- 情怀：作业本横线纸 ---------- */
+  /* ---------- 情怀 ---------- */
+  .memory-wrap {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 20px 40px;
+  }
   .memory {
-    background:
-      repeating-linear-gradient(transparent, transparent 37px, rgba(44,62,112,0.18) 37px, rgba(44,62,112,0.18) 38px),
-      #fdf9ec;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 28px;
+    align-items: start;
+    background: #fdf9ec;
     border: 1px solid rgba(0,0,0,0.06);
     border-left: 3px solid rgba(192,57,43,0.5);
     border-radius: 6px;
-    padding: 26px 26px 20px;
+    padding: 28px 28px 24px;
     box-shadow: var(--shadow);
-    font-family: var(--kai);
+  }
+  .memory-text {
+    font-family: var(--serif);
     color: var(--ink-blue);
     font-size: 1.02rem;
+    line-height: 1.85;
   }
-  .memory p { margin: 0 0 6px; text-indent: 2em; }
-  .memory p.no-indent { text-indent: 0; }
-  .memory .quote {
+  .memory-text p { margin: 0 0 10px; text-indent: 2em; }
+  .memory-text p.no-indent { text-indent: 0; }
+  .memory-text .quote {
     text-align: center;
     margin: 18px 0 8px;
-    font-size: 1.25rem;
+    font-size: 1.2rem;
     color: var(--red-dark);
     letter-spacing: 2px;
+    text-indent: 0;
   }
-  .memory .quote small { display: block; font-size: 0.8rem; color: #8a8070; letter-spacing: 4px; margin-top: 6px; }
+  .memory-text .quote small {
+    display: block;
+    font-size: 0.78rem;
+    color: #8a8070;
+    letter-spacing: 4px;
+    margin-top: 6px;
+    font-family: var(--sans);
+  }
+  .memory-img {
+    width: 100%;
+    border-radius: 4px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    display: block;
+  }
+  @media (max-width: 640px) {
+    .memory { grid-template-columns: 1fr; }
+    .memory-img { order: -1; max-height: 220px; object-fit: cover; }
+  }
 
   /* ---------- 目录 ---------- */
   .catalog { max-width: 1100px; margin: 0 auto; padding: 16px 16px 60px; }
   .grade-title {
     grid-column: 1 / -1;
-    font-family: var(--kai);
+    font-family: var(--serif);
     font-size: 1.05rem;
     color: var(--ink-blue);
     letter-spacing: 2px;
@@ -185,6 +316,13 @@
   }
   .card h3 { margin: 10px 0 2px; font-size: 1rem; color: var(--red-dark); }
   .card .meta { font-size: 0.8rem; color: #777; }
+  .card .pages {
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    color: #aaa;
+    margin-top: 2px;
+    letter-spacing: 1px;
+  }
   .card .resume {
     position: absolute;
     top: 8px;
@@ -205,45 +343,77 @@
     background: var(--paper-deep);
   }
 
+  @media (max-width: 720px) {
+    .hero { grid-template-columns: 1fr; text-align: center; }
+    .hero-left .stats { justify-content: center; }
+    .hero-left .lead { margin-left: auto; margin-right: auto; }
+    .hero-right { height: 200px; }
+    .cover-collage { transform: scale(0.85); }
+  }
   @media (max-width: 480px) {
-    .hero { padding: 40px 16px 28px; }
+    .hero { padding: 32px 16px 24px; }
     .grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
     .card { padding: 10px 8px 12px; }
-    .memory { padding: 20px 16px 16px; }
     .section { padding: 24px 16px; }
+    .big-quote { padding: 40px 16px; }
   }
 </style>
 </head>
 <body>
 
+<div class="topbar">1980s &nbsp;·&nbsp; 人教版六年制 &nbsp;·&nbsp; 十二册 &nbsp;·&nbsp; 854页</div>
+
 <header class="hero">
-  <span class="tag">人 教 版 · 六 年 制</span>
-  <h1>80年代小学语文课本</h1>
-  <p class="sub">全十二册 · 高清扫描 · 在线怀旧阅读</p>
-  <div class="stats">
-    <span><b>12</b> 册</span>
-    <span><b>6</b> 个学年</span>
-    <span><b>1980s</b> 人教版</span>
+  <div class="hero-left">
+    <div class="kicker">RENMIN JIAOYU CHUBANSHE · 1980s</div>
+    <h1>80年代小学语文课本</h1>
+    <p class="lead">从 a o e 到《小马过河》，从铅笔头到红领巾。十二册课本，藏着一整代人的晨读声。</p>
+    <div class="stats">
+      <span><b>12</b> 册</span>
+      <span><b>854</b> 页</span>
+      <span><b>6</b> 学年</span>
+    </div>
+  </div>
+  <div class="hero-right">
+    <div class="cover-collage">
+      <img src="covers/v01.jpg?v=2" alt="第一册封面" loading="lazy">
+      <img src="covers/v04.jpg?v=2" alt="第四册封面" loading="lazy">
+      <img src="covers/v08.jpg?v=2" alt="第八册封面" loading="lazy">
+      <img src="covers/v12.jpg?v=2" alt="第十二册封面" loading="lazy">
+    </div>
   </div>
 </header>
 
-<section class="section">
-  <h2 class="section-title">关于这套课本</h2>
-  <div class="about">
-    <p>这是人民教育出版社编制的六年制小学语文教材，通行于上世纪八十年代至九十年代初，整整伴随了一代人从 a、o、e 走到能写出六百字作文。它不只是一套课本，更是一代人共同的识字起点和阅读启蒙。</p>
-    <p>十二册课本，从第一册的拼音田字格，到高年级的《小马过河》《骄傲的孔雀》《珍贵的教科书》，每一页黑白插图、每一课生字表，都带着那个年代特有的朴素与认真。教材已绝版多年，旧书散落在旧书市场和故纸堆里。本站将十二册原书逐页扫描整理，做成在线阅读，只为留住一份可以随时翻开的记忆。</p>
-  </div>
+<section class="big-quote">
+  <blockquote>
+    河水既不像老牛说的那样浅，也不像松鼠说的那样深。
+    <cite>《小马过河》</cite>
+  </blockquote>
 </section>
 
 <section class="section">
-  <h2 class="section-title">写给翻书的人</h2>
-  <div class="memory">
-    <p class="no-indent">如果你也曾在清晨的教室里大声朗读，也曾把铅笔削得只剩一小截还舍不得扔，也曾因为背不出课文被留堂——那么这十二册书里，藏着你我都回不去的童年。</p>
-    <p>那时候的快乐很简单：新课本发下来先闻油墨香，包上挂历纸的书皮；一篇课文背完，老师用红笔打个大大的勾；下课时折纸飞机，用透明胶粘补破了角的作业本。</p>
-    <p>一晃几十年。课本还在，翻书的人已经到了中年。再点开第一册，那个跟着老师念"a——o——e——"的小孩，仿佛就坐在昨天的教室里，阳光斜斜地照在课桌上。</p>
-    <p class="quote">回不去的青春，就让它住在这里。<small>—— 珍惜当下，好好生活 ——</small></p>
+  <h2 class="section-title">关于这套课本</h2>
+  <div class="about two-col">
+    <p>这是人民教育出版社编制的六年制小学语文教材，通行于上世纪八十年代至九十年代初。整整一代人，从 a o e 开始，跟着它学会了写字、读书、写作文。</p>
+    <p>十二册课本，从第一册的拼音田字格，到高年级的《小马过河》《骄傲的孔雀》《珍贵的教科书》。每一页黑白插图、每一课生字表，都带着那个年代特有的朴素与认真。</p>
+    <p>教材已绝版多年，旧书散落在旧书市场和故纸堆里。本站将十二册原书逐页扫描整理，做成在线阅读，只为留住一份可以随时翻开的记忆。</p>
   </div>
 </section>
+
+<section class="section" style="padding-bottom:8px;">
+  <h2 class="section-title">写给翻书的人</h2>
+</section>
+<div class="memory-wrap">
+  <div class="memory">
+    <div class="memory-text">
+      <p class="no-indent">如果你也曾在清晨的教室里大声朗读，也曾把铅笔削得只剩一小截还舍不得扔，也曾因为背不出课文被留堂——那这十二册书里，一定有你我都回不去的童年。</p>
+      <p>那时候的快乐很简单。新课本发下来，第一件事是闻油墨香，然后包上挂历纸的书皮。一篇课文背完，老师用红笔打个大大的勾。下课时折纸飞机，用透明胶粘补破了角的作业本。</p>
+      <p>一晃几十年。课本还在，翻书的人已经到了中年。再点开第一册，那个跟着老师念 a o e 的小孩，仿佛就坐在昨天的教室里，阳光斜斜地照在课桌上。</p>
+      <p class="quote">回不去的青春，就让它住在这里。<small>珍惜当下，好好生活</small></p>
+    </div>
+    <img class="memory-img" src="images/classroom.webp" alt="80年代教室插画" loading="lazy" width="1200" height="800">
+  </div>
+</div>
 
 <section class="catalog">
   <h2 class="section-title">十二册课本目录</h2>

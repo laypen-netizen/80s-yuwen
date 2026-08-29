@@ -31,6 +31,9 @@ for (const g of groups) {
     const meta = document.createElement('div');
     meta.className = 'meta';
     meta.textContent = v.grade;
+    const pages = document.createElement('div');
+    pages.className = 'pages';
+    pages.textContent = 'P' + v.pages;
     // 恢复上次阅读进度提示
     try {
       const m = JSON.parse(localStorage.getItem('yw80-progress-v1') || '{}');
@@ -42,7 +45,7 @@ for (const g of groups) {
         a.appendChild(badge);
       }
     } catch { /* 忽略 */ }
-    a.append(wrap, h3, meta);
+    a.append(wrap, h3, meta, pages);
     grid.appendChild(a);
   }
 }
