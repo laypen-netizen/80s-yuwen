@@ -72,15 +72,15 @@
     font-family: var(--serif);
     font-size: clamp(2rem, 5.2vw, 3.4rem);
     font-weight: 700;
-    line-height: 1.15;
+    line-height: 1.2;
     color: var(--red-dark);
-    letter-spacing: 2px;
+    letter-spacing: 3px;
   }
   .hero-left .lead {
-    margin: 14px 0 0;
+    margin: 16px 0 0;
     color: #6b6357;
     font-size: clamp(0.92rem, 2.2vw, 1.1rem);
-    line-height: 1.6;
+    line-height: 1.7;
     max-width: 420px;
   }
   .hero-left .stats {
@@ -133,7 +133,7 @@
   /* ---------- 大引用页 ---------- */
   .big-quote {
     background: var(--paper-deep);
-    padding: 56px 20px;
+    padding: 64px 20px;
     text-align: center;
   }
   .big-quote blockquote {
@@ -144,16 +144,18 @@
     line-height: 1.7;
     color: var(--ink-blue);
     position: relative;
+    padding: 0 36px;
   }
   .big-quote blockquote::before {
     content: "「";
     position: absolute;
-    left: -28px;
+    left: 0;
     top: -6px;
     font-size: 2.4rem;
     color: var(--red);
     opacity: .35;
     font-family: var(--serif);
+    line-height: 1;
   }
   .big-quote blockquote::after {
     content: "」";
@@ -161,17 +163,18 @@
     color: var(--red);
     opacity: .35;
     font-family: var(--serif);
-    vertical-align: text-bottom;
+    line-height: 1;
     margin-left: 4px;
+    vertical-align: baseline;
   }
   .big-quote cite {
     display: block;
-    margin-top: 16px;
+    margin-top: 20px;
     font-family: var(--mono);
-    font-size: 0.78rem;
+    font-size: 0.8rem;
     color: #8a8070;
     font-style: normal;
-    letter-spacing: 1px;
+    letter-spacing: 2px;
   }
 
   /* ---------- 章节 ---------- */
@@ -179,12 +182,13 @@
   .section-title {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 16px;
     font-family: var(--serif);
-    font-size: 1.3rem;
+    font-size: 1.25rem;
     color: var(--red-dark);
-    margin: 0 0 18px;
-    letter-spacing: 2px;
+    margin: 0 0 22px;
+    letter-spacing: 3px;
+    font-weight: 600;
   }
   .section-title::before, .section-title::after {
     content: "";
@@ -192,7 +196,7 @@
     height: 1px;
     background: linear-gradient(90deg, transparent, rgba(150,40,27,0.35), transparent);
   }
-  .about p { margin: 0 0 14px; color: #44403a; }
+  .about p { margin: 0 0 16px; color: #44403a; line-height: 1.85; text-align: justify; }
   .about .two-col {
     column-count: 2;
     column-gap: 32px;
@@ -208,38 +212,40 @@
   .memory {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 28px;
+    gap: 32px;
     align-items: start;
     background: #fdf9ec;
     border: 1px solid rgba(0,0,0,0.06);
     border-left: 3px solid rgba(192,57,43,0.5);
     border-radius: 6px;
-    padding: 28px 28px 24px;
+    padding: 32px 32px 28px;
     box-shadow: var(--shadow);
   }
   .memory-text {
     font-family: var(--serif);
     color: var(--ink-blue);
-    font-size: 1.02rem;
-    line-height: 1.85;
+    font-size: 1.05rem;
+    line-height: 1.9;
   }
-  .memory-text p { margin: 0 0 10px; text-indent: 2em; }
+  .memory-text p { margin: 0 0 14px; text-indent: 2em; }
   .memory-text p.no-indent { text-indent: 0; }
   .memory-text .quote {
     text-align: center;
-    margin: 18px 0 8px;
-    font-size: 1.2rem;
+    margin: 22px 0 10px;
+    font-size: 1.25rem;
     color: var(--red-dark);
-    letter-spacing: 2px;
+    letter-spacing: 3px;
     text-indent: 0;
+    font-weight: 600;
   }
   .memory-text .quote small {
     display: block;
     font-size: 0.78rem;
     color: #8a8070;
     letter-spacing: 4px;
-    margin-top: 6px;
+    margin-top: 8px;
     font-family: var(--sans);
+    font-weight: 400;
   }
   .memory-img {
     width: 100%;
