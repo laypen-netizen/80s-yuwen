@@ -22,8 +22,8 @@ class SR {
   // 整图超分：buf(RGB raw) -> {data, width, height}
   async upscaleImage(buf, width, height) {
     const step = TILE - OVERLAP;
-    const cols = Math.max(1, Math.ceil((width - TILE) / step) + (width <= TILE ? 1 : 0));
-    const rows = Math.max(1, Math.ceil((height - TILE) / step) + (height <= TILE ? 1 : 0));
+    const cols = Math.max(1, Math.ceil((width - OVERLAP) / step));
+    const rows = Math.max(1, Math.ceil((height - OVERLAP) / step));
     const outW = width * 4, outH = height * 4;
     const out = Buffer.alloc(outW * outH * 3);
     const weight = Buffer.alloc(outW * outH);
@@ -52,13 +52,14 @@ class SR {
         feeds[session.inputNames[0]] = input;
         const outputs = await session.run(feeds);
         const od = outputs[session.outputNames[0]].data;
-        for (let ty = 0; ty < TILE; ty++) {
-          const wy = this._tri(ty, TILE);
-          for (let tx = 0; tx < TILE; tx++) {
-            const wx = this._tri(tx, TILE);
-            const ox = t.x0 * 4 + tx * 4, oy = t.y0 * 4 + ty * 4;
+        const tileOut = TILE * 4; // 896
+        for (let ty = 0; ty < tileOut; ty++) {
+          const wy = this._tri(ty, tileOut);
+          for (let tx = 0; tx < tileOut; tx++) {
+            const wx = this._tri(tx, tileOut);
+            const ox = t.x0 * 4 + tx, oy = t.y0 * 4 + ty;
             for (let ch = 0; ch < 3; ch++) {
-              const v = Math.min(1, Math.max(-1, od[ch * TILE * TILE + ty * TILE + tx]));
+              const v = Math.min(1, Math.max(-1, od[ch * tileOut * tileOut + ty * tileOut + tx]));
               out[(oy * outW + ox) * 3 + ch] += (v + 1) / 2 * 255 * wx * wy;
             }
             weight[oy * outW + ox] += wx * wy * 255;
