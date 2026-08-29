@@ -69,6 +69,16 @@
   }
   .viewer canvas.page-in { animation: pageIn .18s ease-out; }
   @keyframes pageIn { from { opacity: .25; } to { opacity: 1; } }
+  .cover-placeholder {
+    position: absolute;
+    max-width: 90%;
+    max-height: 80vh;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+    border-radius: 4px;
+    display: none;
+    pointer-events: none;
+    background: #fff;
+  }
 
   .overlay {
     position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: none;
@@ -118,6 +128,7 @@
 </div>
 
 <div class="viewer" id="viewer">
+  <img id="coverPlaceholder" class="cover-placeholder" src="" alt="封面" style="display:none;">
   <canvas id="pageCanvas" aria-label="课本页面"></canvas>
   <div class="overlay" id="overlay"><div class="msg" id="msg">正在加载课本扫描件…</div></div>
   <div class="tap-zone left" id="tapLeft" aria-hidden="true"></div>

@@ -18,13 +18,14 @@ for (const g of groups) {
     const a = document.createElement('a');
     a.className = 'card';
     a.href = `read.html?v=${v.n}`;
+    const wrap = document.createElement('div');
+    wrap.className = 'cover-wrap';
     const img = document.createElement('img');
     img.className = 'cover';
     img.src = `covers/v${String(v.n).padStart(2, '0')}.jpg`;
     img.alt = `第${v.n}册封面`;
     img.loading = 'lazy';
-    img.width = 320;
-    img.height = 427;
+    wrap.appendChild(img);
     const h3 = document.createElement('h3');
     h3.textContent = `第${v.n}册`;
     const meta = document.createElement('div');
@@ -41,7 +42,7 @@ for (const g of groups) {
         a.appendChild(badge);
       }
     } catch { /* 忽略 */ }
-    a.append(img, h3, meta);
+    a.append(wrap, h3, meta);
     grid.appendChild(a);
   }
 }
