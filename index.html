@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>80年代小学语文课本 · 人教版六年制</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<style>
+  :root {
+    --paper: #f7f1e3;
+    --ink: #2d2d2d;
+    --red: #c0392b;
+    --red-dark: #96281b;
+    --gold: #d4a017;
+    --card-bg: #fff;
+    --shadow: 0 4px 14px rgba(0,0,0,0.08);
+    --radius: 10px;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.6;
+  }
+  header {
+    text-align: center;
+    padding: 40px 20px 20px;
+    background: linear-gradient(180deg, #fff 0%, var(--paper) 100%);
+  }
+  header h1 {
+    margin: 0;
+    font-size: clamp(1.6rem, 4vw, 2.4rem);
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--red-dark);
+  }
+  header p {
+    margin: 8px 0 0;
+    color: #666;
+    font-size: 0.95rem;
+  }
+  .wrap {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 20px 16px 60px;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 18px;
+  }
+  .card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 12px 10px 14px;
+    text-decoration: none;
+    color: var(--ink);
+    transition: transform .15s ease, box-shadow .15s ease;
+    cursor: pointer;
+    border: 1px solid rgba(0,0,0,0.04);
+  }
+  .card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 22px rgba(0,0,0,0.12);
+  }
+  .cover {
+    width: 100%;
+    aspect-ratio: 3/4;
+    object-fit: cover;
+    border-radius: 6px;
+    background: #eee;
+    display: block;
+  }
+  .card h3 {
+    margin: 10px 0 2px;
+    font-size: 1rem;
+    color: var(--red-dark);
+  }
+  .card .meta {
+    font-size: 0.8rem;
+    color: #777;
+  }
+  footer {
+    text-align: center;
+    padding: 24px 16px 40px;
+    color: #999;
+    font-size: 0.85rem;
+  }
+  @media (max-width: 480px) {
+    .grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    .card { padding: 10px 8px 12px; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>80年代小学语文课本</h1>
+  <p>人教版六年制 · 全十二册在线阅读</p>
+</header>
+<div class="wrap">
+  <div class="grid" id="grid"></div>
+</div>
+<footer>
+  仅供个人学习怀旧使用 · 素材版权归原作者及出版社所有
+</footer>
+
+<script type="module">
+  import { VOLUMES } from './js/volumes.js';
+  const grid = document.getElementById('grid');
+  for (const v of VOLUMES) {
+    const a = document.createElement('a');
+    a.className = 'card';
+    a.href = `read.html?v=${v.n}`;
+    const img = document.createElement('img');
+    img.className = 'cover';
+    img.src = `covers/v${String(v.n).padStart(2,'0')}.jpg`;
+    img.alt = `第${v.n}册封面`;
+    img.loading = 'lazy';
+    const h3 = document.createElement('h3');
+    h3.textContent = `第${v.n}册`;
+    const meta = document.createElement('div');
+    meta.className = 'meta';
+    meta.textContent = v.grade;
+    a.append(img, h3, meta);
+    grid.appendChild(a);
+  }
+</script>
+</body>
+</html>
