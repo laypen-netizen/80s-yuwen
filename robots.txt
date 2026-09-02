@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://laypen-netizen.github.io/80s-yuwen/sitemap.xml

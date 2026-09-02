@@ -5,8 +5,8 @@
   var vol = window.VOLUMES.find(function (v) { return v.n === volN; }) || window.VOLUMES[0];
   var TOTAL = vol.pages || 61;
   var IMG_BASE = 'pages/v' + String(vol.n).padStart(2, '0') + '/';
-  var IMG_VER = '?v=3';
-  var COVER_URL = 'covers/v' + String(vol.n).padStart(2, '0') + '.jpg?v=2';
+  var IMG_VER = '?v=4';
+  var COVER_URL = 'covers/v' + String(vol.n).padStart(2, '0') + '.jpg?v=3';
   var STORE_KEY = 'yw80-progress-v1';
 
   document.getElementById('vTitle').textContent = '第' + vol.n + '册';
