@@ -54,7 +54,7 @@
     if (cache.has(page)) return cache.get(page);
     const promise = new Promise((resolve, reject) => {
       const image = new Image();
-      const timeout = setTimeout(() => finish(false), 20000);
+      const timeout = setTimeout(() => finish(false), 45000);
       function finish(ok) {
         clearTimeout(timeout);
         image.onload = null;
