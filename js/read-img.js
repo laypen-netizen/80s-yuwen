@@ -1,194 +1,185 @@
 (function () {
   'use strict';
-  var params = new URLSearchParams(location.search);
-  var volN = Math.min(12, Math.max(1, parseInt(params.get('v') || '1', 10) || 1));
-  var vol = window.VOLUMES.find(function (v) { return v.n === volN; }) || window.VOLUMES[0];
-  var TOTAL = vol.pages || 61;
-  var IMG_BASE = 'pages/v' + String(vol.n).padStart(2, '0') + '/';
-  var IMG_VER = '?v=4';
-  var COVER_URL = 'covers/v' + String(vol.n).padStart(2, '0') + '.jpg?v=3';
-  var STORE_KEY = 'yw80-progress-v1';
+  const library = window.Yuwen;
+  const volume = library.getVolume(new URLSearchParams(location.search).get('v'));
+  const total = volume.pages;
+  const $ = id => document.getElementById(id);
+  const img = $('pageImg');
+  const viewer = $('viewer');
+  const overlay = $('overlay');
+  const message = $('msg');
+  const readingStatus = $('readerStatus');
+  const retryButton = $('retryButton');
+  const slider = $('pageSlider');
+  const pageInput = $('pageInput');
+  const prevButton = $('btnPrev');
+  const nextButton = $('btnNext');
+  const volumeSelect = $('volumeSelect');
+  const cache = new Map();
+  let currentPage = 0;
+  let requestId = 0;
+  let state = 'idle';
+  let swipeStart = null;
 
-  document.getElementById('vTitle').textContent = '第' + vol.n + '册';
-  document.getElementById('vSub').textContent = vol.grade;
-  document.title = '第' + vol.n + '册 · ' + vol.grade + ' · 80年代小学语文课本';
+  $('vTitle').textContent = volume.title;
+  $('vSub').textContent = volume.grade;
+  document.title = `${volume.title} · ${volume.grade} · 80年代小学语文课本`;
+  slider.max = total;
+  pageInput.max = total;
+  $('pageInfo').textContent = `/ ${total} 页`;
+  for (const v of window.VOLUMES) {
+    const option = document.createElement('option');
+    option.value = v.n;
+    option.textContent = `${v.title} · ${v.grade}`;
+    volumeSelect.appendChild(option);
+  }
+  volumeSelect.value = volume.n;
 
-  var img = document.getElementById('pageImg');
-  var viewer = document.getElementById('viewer');
-  var overlay = document.getElementById('overlay');
-  var msgEl = document.getElementById('msg');
-  var placeholder = document.getElementById('coverPlaceholder');
-  var pageInfo = document.getElementById('pageInfo');
-  var slider = document.getElementById('pageSlider');
-  var btnFitWidth = document.getElementById('btnFitWidth');
-  var btnFitPage = document.getElementById('btnFitPage');
-  var btnPrev = document.getElementById('btnPrev');
-  var btnNext = document.getElementById('btnNext');
-
-  var currentPage = 1;
-  var fitMode = 'width';
-  var firstLoad = false;
-  var cache = {};
-
-  function pageUrl(p) {
-    return IMG_BASE + String(p).padStart(4, '0') + '.webp' + IMG_VER;
+  function applyFit(mode) {
+    viewer.dataset.fit = mode;
+    $('btnFitWidth').setAttribute('aria-pressed', String(mode === 'width'));
+    $('btnFitPage').setAttribute('aria-pressed', String(mode === 'page'));
+    library.saveFit(mode);
   }
 
-  function loadProgress() {
-    try {
-      var m = JSON.parse(localStorage.getItem(STORE_KEY) || '{}');
-      var p = m[vol.n];
-      return (typeof p === 'number') ? Math.max(1, Math.min(TOTAL, Math.floor(p))) : null;
-    } catch (e) { return null; }
-  }
-  function saveProgress(n) {
-    try {
-      var m = JSON.parse(localStorage.getItem(STORE_KEY) || '{}');
-      m[vol.n] = n;
-      localStorage.setItem(STORE_KEY, JSON.stringify(m));
-    } catch (e) {}
+  function updateControls() {
+    slider.value = currentPage;
+    slider.setAttribute('aria-valuetext', `第 ${currentPage} 页，共 ${total} 页`);
+    pageInput.value = currentPage;
+    prevButton.disabled = currentPage === 1;
+    nextButton.disabled = currentPage === total;
   }
 
-  function parseHashPage() {
-    var m = location.hash.match(/^#p=(\d+)$/);
-    return m ? Math.max(1, Math.min(TOTAL, parseInt(m[1], 10))) : null;
-  }
-  function syncHash(n) {
-    history.replaceState(null, '', '#p=' + n);
-  }
-
-  function updateUI(n) {
-    pageInfo.textContent = n + ' / ' + TOTAL;
-    slider.value = n;
-    slider.max = TOTAL;
-    syncHash(n);
-    saveProgress(n);
-  }
-
-  function applyFit() {
-    if (fitMode === 'width') {
-      img.style.width = '100%';
-      img.style.height = 'auto';
-    } else {
-      img.style.width = 'auto';
-      img.style.height = '100%';
-    }
-  }
-
-  function setPlaceholderVisible(show) {
-    if (show) {
-      placeholder.hidden = false;
-      placeholder.classList.remove('hidden');
-    } else {
-      placeholder.classList.add('hidden');
-    }
-  }
-
-  function showPage(n) {
-    if (n < 1) n = 1;
-    if (n > TOTAL) n = TOTAL;
-    if (n === currentPage && firstLoad) return;
-    currentPage = n;
-    updateUI(n);
-
-    var url = pageUrl(n);
-
-    // If already cached/loaded, swap immediately
-    if (cache[n] && cache[n].complete) {
-      img.src = url;
-      img.classList.remove('page-in');
-      void img.offsetWidth;
-      img.classList.add('page-in');
-      overlay.classList.add('hidden');
-      setPlaceholderVisible(false);
-      return;
-    }
-
-    // Show placeholder while loading
-    overlay.classList.remove('hidden');
-    msgEl.textContent = '加载第 ' + n + ' 页…';
-    placeholder.src = COVER_URL;
-    setPlaceholderVisible(true);
-    img.style.opacity = '0';
-
-    img.onload = function () {
-      img.onload = null;
-      img.onerror = null;
-      overlay.classList.add('hidden');
-      setPlaceholderVisible(false);
-      img.style.opacity = '1';
-      img.classList.remove('page-in');
-      void img.offsetWidth;
-      img.classList.add('page-in');
-      if (!firstLoad) firstLoad = true;
-    };
-    img.onerror = function () {
-      img.onerror = null;
-      img.onload = null;
-      msgEl.textContent = '第 ' + n + ' 页加载失败，点击重试';
-      overlay.classList.remove('hidden');
-      setPlaceholderVisible(false);
-    };
-    img.src = url;
-
-    // Prefetch neighbours
-    [n + 1, n + 2, n - 1].forEach(function (p) {
-      if (p < 1 || p > TOTAL || cache[p]) return;
-      var pre = new Image();
-      pre.src = pageUrl(p);
-      cache[p] = pre;
+  function loadImage(page) {
+    if (cache.has(page)) return cache.get(page);
+    const promise = new Promise((resolve, reject) => {
+      const image = new Image();
+      const timeout = setTimeout(() => finish(false), 20000);
+      function finish(ok) {
+        clearTimeout(timeout);
+        image.onload = null;
+        image.onerror = null;
+        if (ok && image.naturalWidth > 0) resolve(image);
+        else reject(new Error('Page image unavailable'));
+      }
+      image.onload = () => finish(true);
+      image.onerror = () => finish(false);
+      image.src = library.pageUrl(volume, page);
     });
+    cache.set(page, promise);
+    promise.catch(() => {
+      if (cache.get(page) === promise) cache.delete(page);
+    });
+    return promise;
   }
 
-  // Keyboard
-  document.addEventListener('keydown', function (e) {
-    var t = e.target;
-    if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return;
-    if (e.key === 'ArrowRight' || e.key === ' ') {
-      e.preventDefault();
-      showPage(currentPage + 1);
-    } else if (e.key === 'ArrowLeft') {
-      e.preventDefault();
-      showPage(currentPage - 1);
-    } else if (e.key === 'Home') {
-      e.preventDefault();
-      showPage(1);
-    } else if (e.key === 'End') {
-      e.preventDefault();
-      showPage(TOTAL);
+  function prefetch(page) {
+    // Keep only nearby pages and avoid speculative downloads on constrained networks.
+    for (const key of cache.keys()) if (Math.abs(key - page) > 2) cache.delete(key);
+    const connection = navigator.connection;
+    if (connection && (connection.saveData || /(^|-)2g$/.test(connection.effectiveType))) return;
+    for (const n of [page + 1, page - 1]) {
+      if (n >= 1 && n <= total) loadImage(n).catch(() => {});
+    }
+  }
+
+  async function showPage(value, force = false) {
+    const page = library.clampPage(value, total);
+    if (page === currentPage && state !== 'error' && !force) return;
+    currentPage = page;
+    const id = ++requestId;
+    state = 'loading';
+    updateControls();
+    history.replaceState(null, '', `#p=${page}`);
+    viewer.scrollTop = 0;
+    viewer.setAttribute('aria-busy', 'true');
+    img.hidden = true;
+    overlay.hidden = false;
+    retryButton.hidden = true;
+    message.textContent = `正在加载第 ${page} 页…`;
+    readingStatus.textContent = message.textContent;
+    // Prune on every request, including rapid slider navigation.
+    for (const key of cache.keys()) if (Math.abs(key - page) > 2) cache.delete(key);
+    try {
+      const loaded = await loadImage(page);
+      if (id !== requestId) return;
+      img.src = loaded.src;
+      img.alt = `${volume.title}，${volume.grade}，第 ${page} 页，共 ${total} 页`;
+      img.hidden = false;
+      overlay.hidden = true;
+      viewer.setAttribute('aria-busy', 'false');
+      state = 'ready';
+      library.saveProgress(volume, page);
+      message.textContent = `第 ${page} 页已加载`;
+      readingStatus.textContent = `${volume.title}，第 ${page} 页，共 ${total} 页，已加载`;
+      if (document.activeElement === retryButton) viewer.focus();
+      prefetch(page);
+    } catch {
+      if (id !== requestId) return;
+      state = 'error';
+      viewer.setAttribute('aria-busy', 'false');
+      message.textContent = `第 ${page} 页未能加载，请检查网络后重试。`;
+      readingStatus.textContent = message.textContent;
+      retryButton.hidden = false;
+    }
+  }
+
+  prevButton.addEventListener('click', () => showPage(currentPage - 1));
+  nextButton.addEventListener('click', () => showPage(currentPage + 1));
+  retryButton.addEventListener('click', () => showPage(currentPage, true));
+  $('btnFitWidth').addEventListener('click', () => applyFit('width'));
+  $('btnFitPage').addEventListener('click', () => applyFit('page'));
+  slider.addEventListener('input', () => {
+    slider.setAttribute('aria-valuetext', `第 ${slider.value} 页，共 ${total} 页`);
+  });
+  slider.addEventListener('change', () => showPage(slider.value));
+  $('pageJump').addEventListener('submit', event => {
+    event.preventDefault();
+    if (pageInput.checkValidity()) showPage(pageInput.value);
+  });
+  volumeSelect.addEventListener('change', () => {
+    location.href = `read.html?v=${volumeSelect.value}`;
+  });
+  window.addEventListener('hashchange', () => {
+    const page = library.hashPage(location.hash, total);
+    if (page !== null) showPage(page);
+  });
+  document.querySelector('.skip-link').addEventListener('click', event => {
+    event.preventDefault();
+    viewer.focus();
+  });
+
+  document.addEventListener('keydown', event => {
+    const target = event.target;
+    if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey ||
+        (target && (target.isContentEditable || /^(INPUT|TEXTAREA|SELECT|BUTTON|A)$/.test(target.tagName)))) return;
+    const pages = { ArrowRight: currentPage + 1, ' ': currentPage + 1,
+      ArrowLeft: currentPage - 1, Home: 1, End: total };
+    if (Object.hasOwn(pages, event.key)) {
+      event.preventDefault();
+      showPage(pages[event.key]);
     }
   });
 
-  // Swipe
-  var sx = 0, sy = 0;
-  viewer.addEventListener('touchstart', function (e) {
-    if (e.touches.length > 1) return;
-    sx = e.touches[0].clientX;
-    sy = e.touches[0].clientY;
+  viewer.addEventListener('touchstart', event => {
+    swipeStart = event.touches.length === 1 ? { x: event.touches[0].clientX, y: event.touches[0].clientY } : null;
   }, { passive: true });
-  viewer.addEventListener('touchend', function (e) {
-    if (e.changedTouches.length > 1) return;
-    var dx = e.changedTouches[0].clientX - sx;
-    var dy = e.changedTouches[0].clientY - sy;
-    if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 40) {
-      showPage(dx < 0 ? currentPage + 1 : currentPage - 1);
+  viewer.addEventListener('touchmove', event => {
+    if (event.touches.length > 1) swipeStart = null;
+  }, { passive: true });
+  viewer.addEventListener('touchcancel', () => { swipeStart = null; }, { passive: true });
+  viewer.addEventListener('touchend', event => {
+    const start = swipeStart;
+    swipeStart = null;
+    if (!start || event.changedTouches.length !== 1 || event.touches.length !== 0 ||
+        (window.visualViewport && window.visualViewport.scale > 1)) return;
+    const dx = event.changedTouches[0].clientX - start.x;
+    const dy = event.changedTouches[0].clientY - start.y;
+    if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) {
+      showPage(currentPage + (dx < 0 ? 1 : -1));
     }
   }, { passive: true });
 
-  // Tap zones
-  document.getElementById('tapLeft').addEventListener('click', function () { showPage(currentPage - 1); });
-  document.getElementById('tapRight').addEventListener('click', function () { showPage(currentPage + 1); });
-
-  // Buttons
-  btnPrev.addEventListener('click', function () { showPage(currentPage - 1); });
-  btnNext.addEventListener('click', function () { showPage(currentPage + 1); });
-  btnFitWidth.addEventListener('click', function () { fitMode = 'width'; applyFit(); });
-  btnFitPage.addEventListener('click', function () { fitMode = 'page'; applyFit(); });
-  slider.addEventListener('input', function () { showPage(parseInt(slider.value, 10)); });
-  window.addEventListener('resize', function () { applyFit(); });
-
-  // Init
-  var startPage = parseHashPage() || loadProgress() || 1;
-  showPage(startPage);
-  applyFit();
+  applyFit(library.getFit());
+  showPage(library.hashPage(location.hash, total) || library.readProgress()[volume.n] || 1);
 })();

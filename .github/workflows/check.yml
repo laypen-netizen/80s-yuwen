@@ -1,0 +1,20 @@
+name: Static site checks
+on:
+  push:
+    branches: [main]
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check JavaScript syntax
+        run: |
+          node --check js/volumes.js
+          node --check js/library.js
+          node --check js/index.js
+          node --check js/read-img.js
+      - name: Verify layout, reading behavior and assets
+        run: node --test tests/homepage-layout.test.mjs tests/library.test.mjs tests/reader.test.mjs tests/assets.test.mjs

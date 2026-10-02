@@ -2,7 +2,8 @@ import assert from "node:assert/strict";
 import { existsSync, readFileSync } from "node:fs";
 import test from "node:test";
 
-const html = readFileSync(new URL("../index.html", import.meta.url), "utf8");
+const html = readFileSync(new URL("../index.html", import.meta.url), "utf8")
+  + readFileSync(new URL("../css/home.css", import.meta.url), "utf8");
 
 function readWebpDimensions(url) {
   const bytes = readFileSync(url);
@@ -57,8 +58,8 @@ test("情怀区使用明确的桌面与移动端阅读顺序", () => {
 });
 
 test("首页使用新版响应式教室插画资源", () => {
-  assert.match(html, /src="images\/classroom-v2-1200\.webp"/);
-  assert.match(html, /srcset="images\/classroom-v2-800\.webp 800w, images\/classroom-v2-1200\.webp 1200w"/);
+  assert.match(html, /src="images\/classroom-v2-1200\.webp\?v=2"/);
+  assert.match(html, /srcset="images\/classroom-v2-800\.webp\?v=2 800w, images\/classroom-v2-1200\.webp\?v=2 1200w"/);
   assert.match(html, /sizes="\(max-width: 480px\) calc\(100vw - 72px\), \(max-width: 640px\) calc\(100vw - 76px\), \(max-width: 960px\) calc\(46vw - 64\.4px\), 378px"/);
   assert.match(html, /loading="lazy"/);
   assert.match(html, /decoding="async"/);
